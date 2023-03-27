@@ -114,7 +114,12 @@ const Home: NextPage = () => {
                 <SignInButton />
               </div>
             )}
-            {isSignedIn && <CreatePostWizard />}
+            {isSignedIn && (
+              <div>
+                <CreatePostWizard />
+                <SignOutButton />
+              </div>
+            )}
           </div>
 
           <Feed />
