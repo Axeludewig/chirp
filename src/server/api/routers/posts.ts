@@ -12,6 +12,7 @@ import { RouterOutputs } from "../../../utils/api";
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
 import { filterUserForCLient } from "~/server/helpers/filterUserForClient";
+import { Post } from "@prisma/client";
 
 const addUserDataToPosts = async (posts: Post[]) => {
   const users = (
