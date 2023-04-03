@@ -1,4 +1,3 @@
-import { User } from "@clerk/nextjs/dist/api";
 import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -10,16 +9,9 @@ import {
 } from "~/server/api/trpc";
 import { RouterOutputs } from "../../../utils/api";
 
-const filterUserForCLient = (user: User) => {
-  return {
-    id: user.id,
-    username: user.username,
-    profileImageUrl: user.profileImageUrl,
-  };
-};
-
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
+import { filterUserForCLient } from "~/server/helpers/filterUserForClient";
 
 // Create a new ratelimiter, that allows 3 requests per 30 seconds
 const ratelimit = new Ratelimit({
