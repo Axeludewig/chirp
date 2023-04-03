@@ -11,34 +11,46 @@ import { RouterOutputs } from "../../../utils/api";
 
 import { Ratelimit } from "@upstash/ratelimit"; // for deno: see above
 import { Redis } from "@upstash/redis";
-import { filterUserForCLient } from "~/server/helpers/filterUserForClient";
+import { filterUserForClient } from "~/server/helpers/filterUserForClient";
 import { Post } from "@prisma/client";
 
 const addUserDataToPosts = async (posts: Post[]) => {
+  const userId = posts.map((post) => post.authorId);
   const users = (
     await clerkClient.users.getUserList({
-      userId: posts.map((post) => post.authorId),
-      limit: 100,
+      userId: userId,
+      limit: 110,
     })
-  ).map(filterUserForCLient);
+  ).map(filterUserForClient);
 
-  console.log(users);
+  const debug = await clerkClient.users.getUserList({
+    userId: userId,
+    limit: 110,
+  });
+
+  console.log("DEBUG VARIABLE");
+  console.log(debug);
 
   return posts.map((post) => {
     const author = users.find((user) => user.id === post.authorId);
 
-    if (!author || !author.username) {
+    if (!author) {
+      console.error("AUTHOR NOT FOUND", post);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "Author for post not found",
+        message: `Author for post not found. POST ID: ${post.id}, USER ID: ${post.authorId}`,
       });
     }
+    if (!author.username) {
+      // user the ExternalUsername
 
+      author.username = author.firstName;
+    }
     return {
       post,
       author: {
         ...author,
-        username: author.username,
+        username: author.username ?? "(username not found)",
       },
     };
   });
